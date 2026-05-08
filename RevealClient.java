@@ -20,15 +20,29 @@ public class RevealClient {
                 out.println(name);
 
                 String response = in.nextLine();
-                if (response.equals("in")) {
-                    System.out.println("You are now in the game");
+                if (response.equals("joined")) {
+                    System.out.println("Connected to the game! Type 'quit' to leave.");
+
+                    while (true) {
+                        System.out.print("Guess a letter: ");
+                        String command = userInput.nextLine();
+                        out.println(command);
+
+                        if (command.equalsIgnoreCase("quit")) {
+                            break;
+                        }
+
+                        if (in.hasNextLine()) {
+                            System.out.println("Server: " + in.nextLine());
+                        }
+                    }
                 } else {
-                    System.out.println("Name taken. Please restart and try again.");
+                    System.out.println("This name already exists. Reconnect and try again.");
                 }
             }
 
         } catch (Exception e) {
-            System.out.println("Disconnected from server.");
+            System.out.println("Connection closed or lost.");
         }
     }
 }
