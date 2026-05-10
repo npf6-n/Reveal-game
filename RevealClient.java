@@ -1,48 +1,40 @@
+import java.io.*;
 import java.net.*;
 import java.util.Scanner;
-import java.io.*;
 
 public class RevealClient {
     public static void main(String[] args) {
-        String ipAddress = "127.0.0.1";
-        int port = 1728;
+        try (Socket socket = new Socket("127.0.0.1", 1728)) {
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            Scanner in = new Scanner(socket.getInputStream());
+            Scanner user = new Scanner(System.in);
 
-        try (Socket connection = new Socket(ipAddress, port)) {
-            PrintWriter out = new PrintWriter(connection.getOutputStream(), true);
-            Scanner in = new Scanner(connection.getInputStream());
-            Scanner userInput = new Scanner(System.in);
+            if (in.nextLine().equals("enter")) {
+                System.out.print("Username: ");
+                out.println(user.nextLine());
 
-            String serverMessage = in.nextLine();
-
-            if (serverMessage.equals("enter")) {
-                System.out.print("Enter your unique username: ");
-                String name = userInput.nextLine();
-                out.println(name);
-
-                String response = in.nextLine();
-                if (response.equals("joined")) {
-                    System.out.println("Connected to the game! Type 'quit' to leave.");
-
-                    while (true) {
-                        System.out.print("Guess a letter: ");
-                        String command = userInput.nextLine();
-                        out.println(command);
-
-                        if (command.equalsIgnoreCase("quit")) {
-                            break;
+                if (in.nextLine().equals("joined")) {
+                    System.out.println("In Lobby. Type letters to guess.");
+                    while (in.hasNextLine()) {
+                        String fromServer = in.nextLine();
+                        // This handles the GUI-ready status string
+                        if (fromServer.startsWith("STATUS")) {
+                            String[] parts = fromServer.split("\\|");
+                            System.out.println("\n[PLAYERS]: " + parts[1]);
+                            System.out.println("[LIVES]: " + parts[2]);
+                            System.out.println("[WORD]: " + parts[3]);
+                            System.out.print("Guess: ");
+                        } else {
+                            System.out.println("\nRESULT: " + fromServer);
                         }
 
-                        if (in.hasNextLine()) {
-                            System.out.println("Server: " + in.nextLine());
-                        }
+                        if (user.hasNextLine())
+                            out.println(user.nextLine());
                     }
-                } else {
-                    System.out.println("This name already exists. Reconnect and try again.");
                 }
             }
-
         } catch (Exception e) {
-            System.out.println("Connection closed or lost.");
+            System.out.println("Disconnected.");
         }
     }
 }

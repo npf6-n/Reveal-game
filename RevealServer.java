@@ -1,20 +1,25 @@
 import java.net.*;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Scanner;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class RevealServer {
+
+    // public static String secretWord = "JAVA";
+    // public static StringBuilder currentDisplay = new StringBuilder("_ _ _ _");
+    // public static int lives = 6;
+
+    public static String secretWord = "PROGRAMMING";
+    public static String hiddenWord = "___________"; // Matches length of secretWord
+    public static int lives = 6;
+    public static CopyOnWriteArrayList<Player> activePlayers = new CopyOnWriteArrayList<>();
+
     public static void main(String[] args) {
         int port = 1728;
-        CopyOnWriteArrayList<Player> activePlayers = new CopyOnWriteArrayList<>();
 
         try (ServerSocket listener = new ServerSocket(port)) {
             System.out.println("Waiting for players");
 
             while (true) {
                 Socket connection = listener.accept();
-                System.out.println("New connection accepted.");
 
                 ClientHandler handler = new ClientHandler(connection, activePlayers);
 
